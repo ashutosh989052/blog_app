@@ -1,28 +1,162 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
 body {
-  font-family: Arial;
-  background: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #9face6);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
-.form-container {
-  width: 350px;
-  margin: 100px auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+/* Container */
+.login-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
+
+/* Heading */
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #333;
 }
-button {
-  width: 100%;
-  padding: 10px;
-  background: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 4px;
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
 }
-a {
-  color: #007BFF;
+
+/* Input Group */
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #5561f0;
+    outline: none;
+}
+
+/* Button */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #5561f0;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background: #3944bc;
+}
+
+/* Home Button */
+.home-btn {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+    background: #444;
+    padding: 10px;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.3s;
+}
+
+.home-btn:hover {
+    background: #222;
+}
+
+/* Register / Login Link */
+.register-link {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 15px;
+}
+
+.register-link a {
+    color: #5561f0;
+    text-decoration: none;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Error & Success Alert */
+.alert {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.alert.error {
+    background: #ffdddd;
+    border: 1px solid #e60000;
+    color: #a10000;
+}
+
+.alert.success {
+    background: #ddffdd;
+    border: 1px solid #22b300;
+    color: #226600;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 20px;
+    }
+
+    .login-box h2 {
+        font-size: 1.4rem;
+    }
+
+    .subtitle {
+        font-size: 0.8rem;
+    }
+
+    .login-btn, .home-btn {
+        font-size: 0.95rem;
+    }
 }

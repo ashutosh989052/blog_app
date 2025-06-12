@@ -1,5 +1,11 @@
 <?php
+session_start();
 require_once '../includes/db.php';
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
 $blog_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -32,11 +38,11 @@ $related = $related_stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($blog['title']) ?> | Blogify</title>
     <link rel="stylesheet" href="../assets/css/view.css">
-    <link rel="stylesheet" href="../assets/css/navbar.css">
+    <link rel="stylesheet" href="../assets/css/user_navbar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-<?php include '../navbar.php'; ?>
+<?php include '../includes/user_navbar.php'; ?>
 
 <main class="main-container">
     <div class="blog-reader">
@@ -115,6 +121,7 @@ $related = $related_stmt->get_result();
         </div>
     </section>
 </main>
+
 <?php include '../footer.php'; ?>
 </body>
 </html>

@@ -1,83 +1,183 @@
-/* Reset and font */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
+/* Reset and base styles */
 body {
-  background-color: #f5f7fa;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #f7f8fc, #e0eafc);
+    color: #333;
 }
 
-/* Navbar */
-.navbar {
-  background-color: #2c3e50;
-  padding: 15px 25px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+main.dashboard-wrapper {
+    padding: 20px;
+    max-width: fill;
+    margin: auto;
+    animation: fadeIn 0.7s ease-in-out;
 }
 
-.logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
+.dashboard-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 15px;
 }
 
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 20px;
+.dashboard-header h1 {
+    font-size: 28px;
+    color: #2c3e50;
+    animation: slideInLeft 0.5s ease-in-out;
 }
 
-.nav-links li a {
-  color: #ecf0f1;
-  text-decoration: none;
-  font-size: 16px;
-  transition: 0.3s ease;
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 30px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.15);
+    transition: 0.3s;
 }
 
-.nav-links li a:hover {
-  color: #1abc9c;
+.search-bar input[type="text"] {
+    border: none;
+    outline: none;
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 30px;
+    width: 200px;
 }
 
-.nav-links .logout {
-  color: #e74c3c;
+.search-bar button {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.3s ease;
 }
 
-/* Dashboard Content */
-.dashboard-content {
-  padding: 40px 25px;
-  max-width: 800px;
-  margin: auto;
-  background: #ffffff;
-  margin-top: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  text-align: center;
+.search-bar button:hover {
+    background: #2980b9;
 }
 
-.dashboard-content h2 {
-  font-size: 26px;
-  color: #333;
-  margin-bottom: 15px;
+.blogs-section {
+    margin-top: 40px;
 }
 
-.dashboard-content p {
-  font-size: 16px;
-  color: #555;
+.blogs-section h2 {
+    font-size: 24px;
+    color: #34495e;
+    margin-bottom: 20px;
+    position: relative;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .nav-links {
+.blogs-section h2 i {
+    margin-right: 8px;
+    color: #2980b9;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.blog-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInUp 0.6s ease-in-out;
+    display: flex;
     flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
+    justify-content: space-between;
+}
 
-  .dashboard-content {
-    padding: 20px 15px;
-  }
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.blog-card h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.blog-card p {
+    font-size: 14px;
+    color: #555;
+    margin: 4px 0;
+}
+
+.read-btn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 14px;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.read-btn:hover {
+    background: #2980b9;
+}
+
+.empty-msg {
+    font-style: italic;
+    color: #777;
+    margin-top: 10px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-bar input[type="text"] {
+        width: 100%;
+    }
+
+    .read-btn {
+        width: 100%;
+        text-align: center;
+    }
 }

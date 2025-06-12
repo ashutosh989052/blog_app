@@ -1,0 +1,117 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+  padding: 0px;
+}
+
+.form-container {
+  background: #fff;
+  max-width: 1000px;
+  margin: auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 1s ease;
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #34495e;
+}
+
+input[type="text"], select, textarea, input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+button {
+  background: linear-gradient(45deg, #3498db, #2980b9);
+  border: none;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(45deg, #2980b9, #3498db);
+}
+
+.msg {
+  text-align: center;
+  margin-bottom: 20px;
+  color: green;
+  font-weight: bold;
+}
+
+#previewImage, #previewOld {
+  max-width: 25%;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  transition: transform 0.3s ease;
+}
+
+#previewImage:hover, #previewOld:hover {
+  transform: scale(1.05);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 99;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
+}
+
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  margin: 15% auto;
+  text-align: center;
+  animation: slideDown 0.5s ease;
+}
+
+.modal-content button {
+  margin: 10px;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(30px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes slideDown {
+  from {opacity: 0; transform: translateY(-50px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: 20px;
+    margin: 15px;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .form-container h2 {
+    font-size: 22px;
+  }
+}
