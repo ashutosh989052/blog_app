@@ -1,0 +1,130 @@
+/* Reset & Base Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f7f9fb;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #1f2937;
+    padding: 15px 30px;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar .logo img {
+    height: 40px;
+}
+
+.nav-menu {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-menu li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-menu li a:hover {
+    color: #38bdf8;
+}
+
+/* Blog View Layout */
+.blog-container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.blog-header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: #1f2937;
+}
+
+.meta-info {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.blog-image img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.blog-content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #374151;
+    margin-top: 10px;
+    white-space: pre-line;
+}
+
+.blog-stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 25px;
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.login-note {
+    margin-top: 20px;
+    font-size: 15px;
+    color: #6b7280;
+}
+
+.login-note a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.login-note a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .blog-container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .blog-header h1 {
+        font-size: 26px;
+    }
+}
