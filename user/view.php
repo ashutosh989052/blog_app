@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $blog_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$user_id = $_SESSION['user_id'] ?? null;
 
 $stmt = $conn->prepare("SELECT blogs.*, users.username, categories.name AS category_name, blogs.category_id 
                         FROM blogs 
@@ -29,6 +30,50 @@ $related_stmt = $conn->prepare("SELECT id, title, image FROM blogs WHERE categor
 $related_stmt->bind_param("ii", $blog['category_id'], $blog_id);
 $related_stmt->execute();
 $related = $related_stmt->get_result();
+
+// Like Handler
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['like'])) {
+    $user_id = $_SESSION['user_id'] ?? null;
+    if ($user_id && $blog_id) {
+        $check = $conn->prepare("SELECT id FROM likes WHERE user_id = ? AND blog_id = ?");
+        $check->bind_param("ii", $user_id, $blog_id);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows === 0) {
+            $like = $conn->prepare("INSERT INTO likes (user_id, blog_id, created_at) VALUES (?, ?, NOW())");
+            $like->bind_param("ii", $user_id, $blog_id);
+            $like->execute();
+        }
+    }
+    header("Location: view.php?id=$blog_id");
+    exit;
+}
+
+// Comment Handler
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comment']) && !empty(trim($_POST['comment_text']))) {
+    $user_id = $_SESSION['user_id'] ?? null;
+    $comment_text = trim($_POST['comment_text']);
+
+    if ($user_id && $comment_text) {
+        $insert = $conn->prepare("INSERT INTO comments (user_id, blog_id, comment, created_at) VALUES (?, ?, ?, NOW())");
+        $insert->bind_param("iis", $user_id, $blog_id, $comment_text);
+        $insert->execute();
+    }
+    header("Location: view.php?id=$blog_id");
+    exit;
+}
+
+// Check if user has already liked this blog
+$alreadyLiked = false;
+if ($user_id) {
+    $like_check = $conn->prepare("SELECT id FROM likes WHERE user_id = ? AND blog_id = ?");
+    $like_check->bind_param("ii", $user_id, $blog_id);
+    $like_check->execute();
+    $like_check->store_result();
+    $alreadyLiked = $like_check->num_rows > 0;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -63,15 +108,43 @@ $related = $related_stmt->get_result();
             <?= $blog['content'] ?>
         </article>
 
-        <div class="interaction-bar">
-            <button class="like-btn"><i class="fas fa-heart"></i> Like (<?= $likeCount ?>)</button>
-            <button class="comment-btn"><i class="fas fa-comment"></i> Comment (<?= $commentCount ?>)</button>
-        </div>
+<!-- Interaction Bar -->
+<div class="interaction-bar">
+    <form method="POST" style="display: inline;">
+<button class="like-btn <?= $alreadyLiked ? 'liked' : '' ?>" 
+        type="button" 
+        id="likeBtn" 
+        data-liked="<?= $alreadyLiked ? '1' : '0' ?>" 
+        data-blog="<?= $blog_id ?>">
+    <i class="fas fa-heart"></i> <span id="likeText"><?= $alreadyLiked ? 'Liked' : 'Like' ?></span> (<span id="likeCount"><?= $likeCount ?></span>)
+</button>
 
-        <!-- Comments Section -->
-        <div class="comment-section">
+
+    </form>
+<a href="#comment-box" class="comment-btn <?= $alreadyCommented ? 'commented' : '' ?>">
+    <i class="fas fa-comment"></i> <?= $alreadyCommented ? 'Commented' : 'Comment' ?> (<?= $commentCount ?>)
+</a>
+
+</div>
+<!-- Comments Section -->
+<div class="comment-section">
     <h3><i class="fas fa-comments"></i> Comments</h3>
 
+    <?php if (isset($_SESSION['user_id'])): ?>
+    <!-- Comment Form -->
+    <form id="commentForm" class="comment-form">
+        <textarea name="comment_text" id="comment-box" rows="3" placeholder="Write your comment..." required></textarea>
+        <div class="form-footer">
+            <span class="char-count" id="charCount">0/300</span>
+            <button type="submit" class="comment-submit-btn">Post Comment</button>
+        </div>
+    </form>
+    <?php else: ?>
+        <p><a href="../login.php">Log in</a> to post a comment.</p>
+    <?php endif; ?>
+
+    <!-- Comment List -->
+    <div id="comment-list">
     <?php
     $comments_query = $conn->query("SELECT comments.comment, users.username, comments.created_at 
                                     FROM comments 
@@ -79,21 +152,38 @@ $related = $related_stmt->get_result();
                                     WHERE blog_id = $blog_id 
                                     ORDER BY comments.created_at DESC");
 
-    if ($comments_query && $comments_query->num_rows > 0) {
-        while ($cmt = $comments_query->fetch_assoc()) {
-            ?>
-            <div class="comment">
-                <strong><?= htmlspecialchars($cmt['username']) ?></strong>
-                <p><?= nl2br(htmlspecialchars($cmt['comment'])) ?></p>
-                <span class="time"><?= date('d M Y, h:i A', strtotime($cmt['created_at'])) ?></span>
-            </div>
-            <?php
-        }
-    } else {
-        echo '<p class="no-comments">No comments yet. Be the first to comment!</p>';
-    }
+    if ($comments_query && $comments_query->num_rows > 0):
+        while ($cmt = $comments_query->fetch_assoc()):
     ?>
+        <div class="comment">
+            <strong><?= htmlspecialchars($cmt['username']) ?></strong>
+            <p><?= nl2br(htmlspecialchars($cmt['comment'])) ?></p>
+            <span class="time"><?= date('d M Y, h:i A', strtotime($cmt['created_at'])) ?></span>
+        </div>
+    <?php endwhile; else: ?>
+        <p class="no-comments">No comments yet. Be the first to comment!</p>
+    <?php endif; ?>
+    </div>
 </div>
+
+<!-- Character Count Script -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const textarea = document.querySelector("textarea[name='comment_text']");
+    const charCount = document.getElementById("charCount");
+
+    if (textarea) {
+        textarea.addEventListener("input", () => {
+            const length = textarea.value.length;
+            charCount.textContent = `${length}/300`;
+            if (length > 300) {
+                textarea.value = textarea.value.substring(0, 300);
+                charCount.textContent = "300/300";
+            }
+        });
+    }
+});
+</script>
 
     <!-- Related Blogs Section -->
     <section class="related-blogs">
@@ -121,6 +211,103 @@ $related = $related_stmt->get_result();
         </div>
     </section>
 </main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const likeBtn = document.getElementById('likeBtn');
+
+    likeBtn.addEventListener('click', () => {
+        const blogId = likeBtn.dataset.blog;
+        
+        fetch('like.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `blog_id=${blogId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('likeCount').textContent = data.like_count;
+                const likeText = document.getElementById('likeText');
+
+                if (data.liked) {
+                    likeBtn.classList.add('liked');
+                    likeText.textContent = 'Liked';
+                } else {
+                    likeBtn.classList.remove('liked');
+                    likeText.textContent = 'Like';
+                }
+            } else if (data.status === 'unauthorized') {
+                alert("Please log in to like this post.");
+                window.location.href = '../login.php';
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const commentForm = document.getElementById('commentForm');
+    const commentList = document.getElementById('comment-list');
+    const commentBox = document.getElementById('comment-box');
+    const charCount = document.getElementById('charCount');
+    const blogId = <?= $blog_id ?>;
+
+    // Submit comment
+    commentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const commentText = commentBox.value.trim();
+        if (!commentText) return;
+
+        fetch('comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `blog_id=${blogId}&comment_text=${encodeURIComponent(commentText)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Create comment HTML
+                const newComment = document.createElement('div');
+                newComment.className = 'comment';
+                newComment.innerHTML = `
+                    <strong>${data.username}</strong>
+                    <p>${data.comment.replace(/\n/g, "<br>")}</p>
+                    <span class="time">${data.created_at}</span>
+                `;
+                // Prepend comment
+                commentList.prepend(newComment);
+                commentBox.value = '';
+                charCount.textContent = '0/300';
+            } else if (data.status === 'unauthorized') {
+                alert("Please log in to post a comment.");
+                window.location.href = '../login.php';
+            } else {
+                alert(data.message || "An error occurred.");
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+        });
+    });
+
+    // Character count live update
+    commentBox.addEventListener("input", () => {
+        let length = commentBox.value.length;
+        if (length > 300) {
+            commentBox.value = commentBox.value.substring(0, 300);
+            length = 300;
+        }
+        charCount.textContent = `${length}/300`;
+    });
+});
+</script>
+
 
 <?php include '../footer.php'; ?>
 </body>

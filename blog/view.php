@@ -115,6 +115,36 @@ $related = $related_stmt->get_result();
         </div>
     </section>
 </main>
+
+<!-- Login Required Modal -->
+<div class="login-popup" id="loginPopup">
+    <div class="login-popup-content">
+        <span class="close-popup" onclick="closeLoginPopup()">&times;</span>
+        <h3><i class="fas fa-sign-in-alt"></i> Please log in to continue</h3>
+        <p>You need to log in or register to like or comment on this blog.</p>
+        <div class="popup-buttons">
+            <a href="../user/login.php" class="popup-btn">Login</a>
+            <a href="../user/register.php" class="popup-btn secondary">Register</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openLoginPopup() {
+        document.getElementById("loginPopup").style.display = "flex";
+    }
+
+    function closeLoginPopup() {
+        document.getElementById("loginPopup").style.display = "none";
+    }
+
+    // Attach listeners for non-auth users
+    <?php if (!isset($_SESSION['user_id'])): ?>
+        document.querySelector('.like-btn').addEventListener('click', openLoginPopup);
+        document.querySelector('.comment-btn').addEventListener('click', openLoginPopup);
+    <?php endif; ?>
+</script>
+
 <?php include '../footer.php'; ?>
 </body>
 </html>

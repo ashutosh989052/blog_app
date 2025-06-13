@@ -7,16 +7,18 @@ $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stmt = $conn->prepare("SELECT id, username, email, password FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT id, username, email, password, deleted_at FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows === 1) {
-        $stmt->bind_result($id, $username, $email, $hashed);
+        $stmt->bind_result($id, $username, $email, $hashed, $deleted_at);
         $stmt->fetch();
 
-        if (password_verify($password, $hashed)) {
+        if ($deleted_at !== null) {
+            $error = "Your account has been banned. Please contact the admin.";
+        } elseif (password_verify($password, $hashed)) {
             $_SESSION['user_id'] = $id;
             $_SESSION['username'] = $username;
             $_SESSION['email'] = $email;
@@ -30,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

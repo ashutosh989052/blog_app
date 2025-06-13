@@ -1,37 +1,69 @@
 <?php
 session_start();
 require_once '../includes/db.php';
+if (!isset($_SESSION['admin_id'])) exit("Unauthorized");
 
-$blogs = $conn->query("SELECT blogs.*, users.username FROM blogs JOIN users ON blogs.user_id = users.id");
+// Soft delete blog
+if (isset($_GET['delete'])) {
+    $id = intval($_GET['delete']);
+    $conn->query("UPDATE blogs SET deleted_at = NOW() WHERE id = $id");
+}
 
-include 'navbar_admin.php';
+// Restore blog
+if (isset($_GET['restore'])) {
+    $id = intval($_GET['restore']);
+    $conn->query("UPDATE blogs SET deleted_at = NULL WHERE id = $id");
+}
+
+// Search blogs
+$search = $_GET['search'] ?? '';
+$sql = "SELECT blogs.*, users.username FROM blogs 
+        JOIN users ON blogs.user_id = users.id 
+        WHERE (blogs.title LIKE '%$search%' OR users.username LIKE '%$search%') 
+        ORDER BY blogs.created_at DESC";
+$blogs = $conn->query($sql);
 ?>
+<?php include '../includes/admin_navbar.php'; ?>
+<link rel="stylesheet" href="../assets/css/admin_blogs.css">
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Manage Blogs</title>
-  <link rel="stylesheet" href="../assets/css/admin.css">
-</head>
-<body>
-<div class="container">
-  <h2>All Blogs</h2>
-  <table>
-    <tr>
-      <th>ID</th><th>Title</th><th>Author</th><th>Date</th><th>Actions</th>
-    </tr>
-    <?php while($blog = $blogs->fetch_assoc()): ?>
-      <tr>
-        <td><?= $blog['id'] ?></td>
-        <td><?= htmlspecialchars($blog['title']) ?></td>
-        <td><?= htmlspecialchars($blog['username']) ?></td>
-        <td><?= date('d M Y', strtotime($blog['created_at'])) ?></td>
-        <td>
-          <a href="delete_blog.php?id=<?= $blog['id'] ?>" onclick="return confirm('Delete this blog?')">Delete</a>
-        </td>
-      </tr>
-    <?php endwhile; ?>
-  </table>
+<div class="page-container">
+    <h2 class="page-title">Manage Blogs</h2>
+
+    <form method="GET" class="search-form">
+        <input type="text" name="search" placeholder="Search by blog title or user..." value="<?= htmlspecialchars($search) ?>">
+        <button type="submit"><i class="fas fa-search"></i> Search</button>
+    </form>
+
+    <div class="table-wrapper">
+        <table class="blog-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>User</th>
+                    <th>Created At</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($b = $blogs->fetch_assoc()): ?>
+                <tr>
+                    <td><?= htmlspecialchars($b['title']) ?></td>
+                    <td><?= htmlspecialchars($b['username']) ?></td>
+                    <td><?= date('d M Y, h:i A', strtotime($b['created_at'])) ?></td>
+                    <td>
+                        <?= $b['deleted_at'] ? '<span class="status-deleted">Deleted</span>' : '<span class="status-active">Active</span>' ?>
+                    </td>
+                    <td>
+                        <?php if ($b['deleted_at']): ?>
+                            <a href="?restore=<?= $b['id'] ?>" class="btn restore">Restore</a>
+                        <?php else: ?>
+                            <a href="?delete=<?= $b['id'] ?>" class="btn delete" onclick="return confirm('Soft delete this blog?')">Delete</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
-</body>
-</html>
